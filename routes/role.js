@@ -1,9 +1,10 @@
 import { Router } from 'express'
-import { testRole } from '../controllers/role.js'
+import { create, testRole } from '../controllers/role.js'
 
 const router = Router()
 
 // Routes
 router.get('/', testRole)
+router.post('/create', create)
 
 export default router

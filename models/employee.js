@@ -2,6 +2,11 @@ import { Schema, model } from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
 const EmployeeSchema = Schema({
+  user_id: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   first_name: {
     type: String,
     required: true
