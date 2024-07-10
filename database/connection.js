@@ -1,12 +1,8 @@
 import { connect } from 'mongoose'
-import dotenv from 'dotenv'
-
-// Load environment variables
-dotenv.config()
 
 const connection = async () => {
   try {
-    const { DEV_MONGODB_URI } = process.env
+    const DEV_MONGODB_URI = process.env.DEV_MONGODB_URI
     await connect(DEV_MONGODB_URI)
     console.log('Connected to the database in Atlas')
   } catch (error) {

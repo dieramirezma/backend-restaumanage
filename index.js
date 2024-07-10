@@ -1,5 +1,4 @@
 import express from 'express'
-import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import connection from './database/connection.js '
@@ -11,8 +10,6 @@ import RoleRoutes from './routes/role.js'
 import SupplierRoutes from './routes/supplier.js'
 import TableRoutes from './routes/table.js'
 import UserRoutes from './routes/user.js'
-
-dotenv.config()
 
 const PORT = process.env.PORT || 3900
 

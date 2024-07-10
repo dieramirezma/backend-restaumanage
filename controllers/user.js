@@ -2,9 +2,8 @@ import mongoose from 'mongoose'
 import User from '../models/user.js'
 import Role from '../models/role.js'
 import bcrypt from 'bcrypt'
-import dotenv from 'dotenv'
+import { createToken } from '../services/jwt.js'
 
-dotenv.config()
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS)
 
 export const testUser = (req, res) => {
@@ -105,9 +104,12 @@ export const login = async (req, res) => {
 
     const role = await Role.findById(user.role_id)
 
+    const token = createToken(user)
+
     return res.status(200).json({
       status: 'success',
       message: 'User logged in successfully',
+      token,
       data: {
         username: user.username,
         role: {
@@ -121,6 +123,28 @@ export const login = async (req, res) => {
     return res.status(500).json({
       status: 'error',
       message: 'Error in the user login process'
+    })
+  }
+}
+
+export const changePassword = async (req, res) => {
+  try {
+    const { password } = req.body
+
+    if (!password) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Please provide all the required fields'
+      })
+    }
+    return res.status(200).json({
+      status: 'success',
+      message: 'Password changed successfully'
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the password change process'
     })
   }
 }
