@@ -27,7 +27,6 @@ export const ensureAuth = (req, res, next) => {
         }
       } else {
         req.user = decode
-        console.log(decode)
         next()
       }
     })

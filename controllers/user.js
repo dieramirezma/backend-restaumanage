@@ -162,3 +162,63 @@ export const changePassword = async (req, res) => {
     })
   }
 }
+
+export const getUsers = async (req, res) => {
+  try {
+    const { userId, roleId } = req.user
+
+    const roleUser = await Role.findById(roleId)
+
+    // Only can list users if the user has the permission 'listUsers' or 'all
+    if (!roleUser.permissions.includes('listUsers') && !roleUser.permissions.includes('all')) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You do not have permission to list users'
+      })
+    }
+
+    const page = req.params.page ? parseInt(req.params.page, 10) : 1
+    const itemsPerPage = req.query.limit ? parseInt(req.query.limit, 10) : 5
+
+    const options = {
+      page,
+      limit: itemsPerPage,
+      select: '-password -role_id -__v',
+      populate: {
+        path: 'role_id',
+        select: '-_id -__v -created_at'
+      }
+    }
+
+    const users = await User.paginate({}, options)
+
+    if (!users || users.docs.length === 0) {
+      return res.status(404).send({
+        status: 'error',
+        message: 'No users available'
+      })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Get users successfully',
+      data: {
+        users: users.docs,
+        totalDocs: users.totalDocs,
+        totalPages: users.totalPages,
+        page: users.page,
+        pagingCounter: users.pagingCounter,
+        hasPrevPage: users.hasPrevPage,
+        hasNextPage: users.hasNextPage,
+        prevPage: users.prevPage,
+        nextPage: users.nextPage
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the get users process'
+    })
+  }
+}
