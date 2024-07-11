@@ -14,32 +14,27 @@ export const register = async (req, res) => {
   try {
     const params = req.body
 
-    if (!params.username || !params.password || !params.role_id) {
+    if (!params.username || !params.password) {
       return res.status(400).json({
         status: 'error',
         message: 'Please provide all the required fields'
       })
     }
 
-    // Validate role ID
-    if (!mongoose.Types.ObjectId.isValid(params.role_id)) {
-      return res.status(400).send({
-        status: 'error',
-        message: 'Invalid ID'
-      })
-    }
+    const foundRole = await Role.findOne({ role_name: 'customer' })
 
-    const foundRole = await Role.findById(params.role_id)
     if (!foundRole) {
-      return res.status(404).send({
+      return res.status(500).send({
         status: 'error',
         message: 'Role not found'
       })
     }
 
-    const userToSave = new User(params)
+    const user = { ...params, role_id: foundRole._id }
 
-    const foundUser = await User.findOne({ username: params.username })
+    const userToSave = new User(user)
+
+    const foundUser = await User.findOne({ username: userToSave.username })
     if (foundUser) {
       return res.status(409).json({
         status: 'error',
