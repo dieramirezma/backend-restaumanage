@@ -37,8 +37,7 @@ const EmployeeSchema = Schema({
   },
   payroll: {
     salary: {
-      type: Number,
-      required: true
+      type: Number
     },
     bonuses: {
       type: Number
@@ -46,16 +45,13 @@ const EmployeeSchema = Schema({
   },
   schedule: [{
     day: {
-      type: String,
-      required: true
+      type: String
     },
     start_time: {
-      type: String,
-      required: true
+      type: String
     },
     end_time: {
-      type: String,
-      required: true
+      type: String
     }
   }],
   created_at: {

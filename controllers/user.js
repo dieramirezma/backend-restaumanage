@@ -161,7 +161,7 @@ export const changePassword = async (req, res) => {
 
 export const getUsers = async (req, res) => {
   try {
-    const { userId, roleId } = req.user
+    const { roleId } = req.user
 
     const roleUser = await Role.findById(roleId)
 
