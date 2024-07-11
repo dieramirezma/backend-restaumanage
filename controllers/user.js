@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import mongoose from 'mongoose'
 import User from '../models/user.js'
 import Role from '../models/role.js'
@@ -214,6 +215,46 @@ export const getUsers = async (req, res) => {
     return res.status(500).json({
       status: 'error',
       message: 'Error in the get users process'
+    })
+  }
+}
+
+export const changeRole = async (req, res) => {
+  try {
+    const { userId } = req.user
+    const { role_id } = req.body
+
+    if (!role_id) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Please provide all the required fields'
+      })
+    }
+
+    if (!mongoose.isValidObjectId(role_id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid role id'
+      })
+    }
+
+    const user = await User.findByIdAndUpdate(userId, { role_id }, { new: true })
+
+    if (!user) {
+      return res.status(400).send({
+        status: 'error',
+        message: 'Error to update the user role'
+      })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'User role changed successfully'
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the user role change process'
     })
   }
 }
