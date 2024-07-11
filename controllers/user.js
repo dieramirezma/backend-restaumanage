@@ -130,6 +130,7 @@ export const login = async (req, res) => {
 export const changePassword = async (req, res) => {
   try {
     const { password } = req.body
+    const { userId } = req.user
 
     if (!password) {
       return res.status(400).json({
@@ -137,6 +138,19 @@ export const changePassword = async (req, res) => {
         message: 'Please provide all the required fields'
       })
     }
+
+    const salt = await bcrypt.genSalt(SALT_ROUNDS)
+    const newPassword = await bcrypt.hash(password, salt)
+
+    const user = await User.findByIdAndUpdate(userId, { password: newPassword }, { new: true })
+
+    if (!user) {
+      return res.status(400).send({
+        status: 'error',
+        message: 'Error to update the user password'
+      })
+    }
+
     return res.status(200).json({
       status: 'success',
       message: 'Password changed successfully'
