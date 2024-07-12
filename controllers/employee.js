@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { getRoleById } from '../services/roleService.js'
 import Employee from '../models/employee.js'
+import mongoose, { mongo } from 'mongoose'
 
 export const testEmployee = (req, res) => {
   res.send('Employee controller works')
@@ -163,7 +164,7 @@ export const getEmployees = async (req, res) => {
     const options = {
       page,
       limit: itemsPerPage,
-      select: '-created_at -_id -__v',
+      select: '-created_at -__v',
       populate: {
         path: 'role_id',
         select: '-_id -__v -created_at'
@@ -199,6 +200,69 @@ export const getEmployees = async (req, res) => {
     return res.status(500).json({
       status: 'error',
       message: 'Error in the get employees process'
+    })
+  }
+}
+
+export const updatePayroll = async (req, res) => {
+  try {
+    const { roleId } = req.user
+    const { id } = req.params
+    const { salary, bonuses } = req.body
+
+    const { role_permissions } = await getRoleById(roleId)
+
+    if (!role_permissions.includes('update_payroll') && !role_permissions.includes('all')) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You do not have permission to update payroll'
+      })
+    }
+
+    if (!id) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Please provide an employee id'
+      })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid employee id'
+      })
+    }
+
+    if (!salary) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Please provide a salary'
+      })
+    }
+
+    const employee = await Employee.findByIdAndUpdate(id, { payroll: { salary, bonuses } }, { new: true })
+
+    if (!employee) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Employee not found'
+      })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Update payroll successfully',
+      data: {
+        first_name: employee.first_name,
+        last_name: employee.last_name,
+        salary: employee.payroll.salary,
+        bonuses: employee.payroll.bonuses
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the update payroll process'
     })
   }
 }
