@@ -166,7 +166,7 @@ export const getUsers = async (req, res) => {
     const roleUser = await Role.findById(roleId)
 
     // Only can list users if the user has the permission 'listUsers' or 'all
-    if (!roleUser.permissions.includes('listUsers') && !roleUser.permissions.includes('all')) {
+    if (!roleUser.permissions.includes('list_users') && !roleUser.permissions.includes('all')) {
       return res.status(403).json({
         status: 'error',
         message: 'You do not have permission to list users'

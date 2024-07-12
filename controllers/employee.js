@@ -143,3 +143,62 @@ export const update = async (req, res) => {
     })
   }
 }
+
+export const getEmployees = async (req, res) => {
+  try {
+    const { roleId } = req.user
+
+    const { role_permissions } = await getRoleById(roleId)
+
+    if (!role_permissions.includes('list_employees') && !role_permissions.includes('all')) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You do not have permission to list employees'
+      })
+    }
+
+    const page = req.params.page ? parseInt(req.params.page, 10) : 1
+    const itemsPerPage = req.query.limit ? parseInt(req.query.limit, 10) : 5
+
+    const options = {
+      page,
+      limit: itemsPerPage,
+      select: '-created_at -_id -__v',
+      populate: {
+        path: 'role_id',
+        select: '-_id -__v -created_at'
+      }
+    }
+
+    const employees = await Employee.paginate({}, options)
+
+    if (!employees || employees.docs.length === 0) {
+      return res.status(404).send({
+        status: 'error',
+        message: 'No employees available'
+      })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Get employees successfully',
+      data: {
+        employees: employees.docs,
+        totalDocs: employees.totalDocs,
+        totalPages: employees.totalPages,
+        page: employees.page,
+        pagingCounter: employees.pagingCounter,
+        hasPrevPage: employees.hasPrevPage,
+        hasNextPage: employees.hasNextPage,
+        prevPage: employees.prevPage,
+        nextPage: employees.nextPage
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the get employees process'
+    })
+  }
+}
