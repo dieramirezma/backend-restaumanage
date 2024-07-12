@@ -266,3 +266,65 @@ export const updatePayroll = async (req, res) => {
     })
   }
 }
+
+export const updateSchedule = async (req, res) => {
+  try {
+    const { roleId } = req.user
+    const { id } = req.params
+    const { schedule } = req.body
+
+    const { role_permissions } = await getRoleById(roleId)
+
+    if (!role_permissions.includes('update_schedule') && !role_permissions.includes('all')) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You do not have permission to update schedule'
+      })
+    }
+
+    if (!id) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Please provide an employee id'
+      })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid employee id'
+      })
+    }
+
+    if (!schedule) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Please provide a schedule'
+      })
+    }
+
+    const employee = await Employee.findByIdAndUpdate(id, { schedule }, { new: true })
+
+    if (!employee) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Employee not found'
+      })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Update schedule successfully',
+      data: {
+        first_name: employee.first_name,
+        last_name: employee.last_name,
+        schedule: employee.schedule
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the update schedule process'
+    })
+  }
+}
