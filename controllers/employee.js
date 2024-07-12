@@ -328,3 +328,64 @@ export const updateSchedule = async (req, res) => {
     })
   }
 }
+
+export const getPayroll = async (req, res) => {
+  try {
+    const { userId } = req.user
+
+    const employee = await Employee.findOne({ user_id: userId })
+
+    if (!employee) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Employee not found'
+      })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Get payroll successfully',
+      data: {
+        first_name: employee.first_name,
+        last_name: employee.last_name,
+        salary: employee.payroll.salary,
+        bonuses: employee.payroll.bonuses
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the get payroll process'
+    })
+  }
+}
+
+export const getSchedule = async (req, res) => {
+  try {
+    const { userId } = req.user
+
+    const employee = await Employee.findOne({ user_id: userId })
+
+    if (!employee) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Employee not found'
+      })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Get schedule successfully',
+      data: {
+        first_name: employee.first_name,
+        last_name: employee.last_name,
+        schedule: employee.schedule
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the get schedule process'
+    })
+  }
+}
