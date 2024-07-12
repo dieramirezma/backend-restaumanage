@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { getRoleById } from '../services/roleService.js'
 import Employee from '../models/employee.js'
-import mongoose, { mongo } from 'mongoose'
+import mongoose from 'mongoose'
 
 export const testEmployee = (req, res) => {
   res.send('Employee controller works')

@@ -15,7 +15,8 @@ const SupplierSchema = Schema({
     required: true
   },
   address: {
-    type: String
+    type: String,
+    required: true
   },
   created_at: {
     type: Date,
