@@ -4,6 +4,7 @@ import User from '../models/user.js'
 import Role from '../models/role.js'
 import bcrypt from 'bcrypt'
 import { createToken } from '../services/jwt.js'
+import { getRoleById } from '../services/roleService.js'
 
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS)
 
@@ -255,6 +256,56 @@ export const changeRole = async (req, res) => {
     return res.status(500).json({
       status: 'error',
       message: 'Error in the user role change process'
+    })
+  }
+}
+
+export const getOnlyUser = async (req, res) => {
+  try {
+    const user_id = req.params.id
+
+    const { roleId } = req.user
+
+    const { role_name, role_permissions } = await getRoleById(roleId)
+
+    if (!role_permissions.includes('get_user') && role_name !== 'admin') {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You are not allowed to get information from a user'
+      })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(user_id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid user id'
+      })
+    }
+
+    const foundUser = await User.findById(user_id, '-created_at -__v -password').populate({
+      path: 'role_id',
+      select: '-__v -created_at'
+    })
+
+    if (!foundUser) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'User not found'
+      })
+    }
+
+    return res.status(201).json({
+      status: 'success',
+      message: 'Get user information successfully',
+      data: {
+        user: foundUser
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the user get information process'
     })
   }
 }

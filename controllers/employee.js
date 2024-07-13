@@ -389,3 +389,53 @@ export const getSchedule = async (req, res) => {
     })
   }
 }
+
+export const getOnlyEmployee = async (req, res) => {
+  try {
+    const employee_id = req.params.id
+
+    const { roleId } = req.user
+
+    const { role_name, role_permissions } = await getRoleById(roleId)
+
+    if (!role_permissions.includes('get_employee') && role_name !== 'admin') {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You are not allowed to get information from a employee'
+      })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(employee_id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid supplier id'
+      })
+    }
+
+    const foundEmployee = await Employee.findById(employee_id, '-created_at -__v').populate({
+      path: 'role_id',
+      select: '-__v -created_at'
+    })
+
+    if (!foundEmployee) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Employee not found'
+      })
+    }
+
+    return res.status(201).json({
+      status: 'success',
+      message: 'Get employee information successfully',
+      data: {
+        employee: foundEmployee
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the employee get information process'
+    })
+  }
+}

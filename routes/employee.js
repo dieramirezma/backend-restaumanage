@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { create, getEmployees, getPayroll, getSchedule, testEmployee, update, updatePayroll, updateSchedule } from '../controllers/employee.js'
+import { create, getEmployees, getOnlyEmployee, getPayroll, getSchedule, testEmployee, update, updatePayroll, updateSchedule } from '../controllers/employee.js'
 import { ensureAuth } from '../middlewares/auth.js'
 
 const router = Router()
@@ -13,5 +13,6 @@ router.put('/payroll/:id', ensureAuth, updatePayroll)
 router.put('/schedule/:id', ensureAuth, updateSchedule)
 router.get('/payroll-show', ensureAuth, getPayroll)
 router.get('/schedule-show', ensureAuth, getSchedule)
+router.get('/employee/:id', ensureAuth, getOnlyEmployee)
 
 export default router

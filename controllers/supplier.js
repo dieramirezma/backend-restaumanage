@@ -221,14 +221,14 @@ export const getOnlySupplier = async (req, res) => {
       status: 'success',
       message: 'Get supplier information successfully',
       data: {
-        foundSupplier
+        supplier: foundSupplier
       }
     })
   } catch (error) {
     console.log(error)
     return res.status(500).json({
       status: 'error',
-      message: 'Error in the supplier update process'
+      message: 'Error in the supplier get information process'
     })
   }
 }
