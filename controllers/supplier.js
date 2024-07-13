@@ -186,7 +186,7 @@ export const getSuppliers = async (req, res) => {
   }
 }
 
-export const getOnlySupplier = async (req, res) => {
+export const getOneSupplier = async (req, res) => {
   try {
     const supplier_id = req.params.id
 
