@@ -4,6 +4,7 @@ import mongoosePaginate from 'mongoose-paginate-v2'
 const InventoryTransactionsSchema = Schema({
   inventory_id: {
     type: Schema.ObjectId,
+    ref: 'Inventory',
     required: true
   },
   transaction_type: {
@@ -19,8 +20,7 @@ const InventoryTransactionsSchema = Schema({
     default: Date.now
   },
   notes: {
-    type: String,
-    required: true
+    type: String
   },
   created_at: {
     type: Date,
@@ -31,4 +31,4 @@ const InventoryTransactionsSchema = Schema({
 // Add pagination plugin
 InventoryTransactionsSchema.plugin(mongoosePaginate)
 
-export default model('User', InventoryTransactionsSchema, 'users')
+export default model('Inventory_Transaction', InventoryTransactionsSchema, 'inventory_transactions')

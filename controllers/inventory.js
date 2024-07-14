@@ -272,3 +272,51 @@ export const getOneInventoryItem = async (req, res) => {
     })
   }
 }
+
+export const getQuantityAndReorderLevel = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const { roleId } = req.user
+
+    const { role_name, role_permissions } = await getRoleById(roleId)
+
+    if (!role_permissions.includes('get_inventory_item_quantity') && role_name !== 'admin') {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You are not allowed to get information from an inventory item'
+      })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid supplier id'
+      })
+    }
+
+    const item = await Inventory.findById(id, 'item_name quantity reorder_level')
+
+    if (!item) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Inventory item not found'
+      })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Get quantity and reorder level successfully',
+      data: {
+        item_name: item.item_name,
+        quantity: item.quantity,
+        reorder_level: item.reorder_level
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the get quantity and reorder level process'
+    })
+  }
+}
