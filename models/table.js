@@ -11,7 +11,7 @@ const TableSchema = Schema({
     required: true
   },
   location: {
-    type: String, // Inside, Outside, VIP
+    type: String, // IN, OUT
     required: true
   }
 })
