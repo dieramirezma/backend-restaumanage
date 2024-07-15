@@ -103,10 +103,15 @@ export const login = async (req, res) => {
 
     const token = createToken(user)
 
+    // Config cookie
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60
+    })
+
     return res.status(200).json({
       status: 'success',
       message: 'User logged in successfully',
-      token,
       data: {
         username: user.username,
         role: {

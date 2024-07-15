@@ -1,14 +1,14 @@
 import jwt from 'jsonwebtoken'
 
 export const ensureAuth = (req, res, next) => {
-  if (!req.headers.authorization) {
+  if (!req.cookies.access_token) {
     return res.status(401).send({
       status: 'error',
       message: 'Unauthorized'
     })
   }
 
-  const token = req.headers.authorization.replace(/['"]+/g, '')
+  const token = req.cookies.access_token.replace(/['"]+/g, '')
 
   try {
     jwt.verify(token, process.env.SECRET_KEY_JWT, (error, decode) => {
