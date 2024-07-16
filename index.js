@@ -40,7 +40,7 @@ app.use('/api/tables', TableRoutes)
 app.use('/api/users', UserRoutes)
 
 app.get('/', (req, res) => {
-  res.send('Hello World')
+  res.send('RestauManage API 🚀')
 })
 
 app.listen(PORT, () => {

@@ -314,3 +314,20 @@ export const getOnlyUser = async (req, res) => {
     })
   }
 }
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie('access_token', {
+      httpOnly: true
+    })
+    return res.status(200).send({
+      status: 'success',
+      message: 'User logged out successfully'
+    })
+  } catch (error) {
+    return res.status(500).send({
+      status: 'error',
+      message: 'Error in the logout process'
+    })
+  }
+}
