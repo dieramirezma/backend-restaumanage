@@ -16,7 +16,7 @@ export const register = async (req, res) => {
   try {
     const params = req.body
 
-    if (!params.username || !params.password) {
+    if (!params.username || !params.password || !params.email) {
       return res.status(400).json({
         status: 'error',
         message: 'Please provide all the required fields'
@@ -36,7 +36,13 @@ export const register = async (req, res) => {
 
     const userToSave = new User(user)
 
-    const foundUser = await User.findOne({ username: userToSave.username })
+    const foundUser = await User.findOne({
+      $or: [{
+        username: userToSave.username,
+        email: userToSave.email
+      }]
+    })
+
     if (foundUser) {
       return res.status(409).json({
         status: 'error',
@@ -56,7 +62,7 @@ export const register = async (req, res) => {
       message: 'User registered successfully',
       data: {
         username: userToSave.username,
-        password: userToSave.password,
+        email: userToSave.email,
         role: {
           role_name: foundRole.role_name,
           permissions: foundRole.permissions
@@ -75,14 +81,20 @@ export const login = async (req, res) => {
   try {
     const params = req.body
 
-    if (!params.username || !params.password) {
+    if ((!params.username && !params.email) || !params.password) {
       return res.status(400).json({
         status: 'error',
         message: 'Please provide all the required fields'
       })
     }
 
-    const user = await User.findOne({ username: params.username })
+    const user = await User.findOne({
+      $or: [
+        { username: params.username },
+        { email: params.email }
+      ]
+    })
+
     if (!user) {
       return res.status(404).json({
         status: 'error',
@@ -171,7 +183,6 @@ export const getUsers = async (req, res) => {
 
     const roleUser = await Role.findById(roleId)
 
-    // Only can list users if the user has the permission 'listUsers' or 'all
     if (!roleUser.permissions.includes('list_users') && !roleUser.permissions.includes('all')) {
       return res.status(403).json({
         status: 'error',

@@ -13,7 +13,6 @@ export const create = async (req, res) => {
       first_name,
       last_name,
       contact_number,
-      email,
       address
     } = req.body
 
@@ -28,7 +27,7 @@ export const create = async (req, res) => {
       })
     }
 
-    if (!first_name || !last_name || !contact_number || !email) {
+    if (!first_name || !last_name || !contact_number) {
       return res.status(400).json({
         status: 'error',
         message: 'Please provide all required fields'
@@ -40,7 +39,6 @@ export const create = async (req, res) => {
       first_name,
       last_name,
       contact_number,
-      email,
       address,
       role_id: roleId
     }
@@ -68,7 +66,6 @@ export const create = async (req, res) => {
         first_name: employee.first_name,
         last_name: employee.last_name,
         contact_number: employee.contact_number,
-        email: employee.email,
         address: employee.address,
         role: {
           role_name,
@@ -128,7 +125,6 @@ export const update = async (req, res) => {
         first_name: employeeUpdated.first_name,
         last_name: employeeUpdated.last_name,
         contact_number: employeeUpdated.contact_number,
-        email: employeeUpdated.email,
         address: employeeUpdated.address,
         role: {
           role_name,
@@ -165,10 +161,16 @@ export const getEmployees = async (req, res) => {
       page,
       limit: itemsPerPage,
       select: '-created_at -__v',
-      populate: {
-        path: 'role_id',
-        select: '-_id -__v -created_at'
-      }
+      populate: [
+        {
+          path: 'role_id',
+          select: '-_id -__v -created_at'
+        },
+        {
+          path: 'user_id',
+          select: '-__v -created_at -password -role_id'
+        }
+      ]
     }
 
     const employees = await Employee.paginate({}, options)
@@ -412,10 +414,16 @@ export const getOnlyEmployee = async (req, res) => {
       })
     }
 
-    const foundEmployee = await Employee.findById(employee_id, '-created_at -__v').populate({
-      path: 'role_id',
-      select: '-__v -created_at'
-    })
+    const foundEmployee = await Employee.findById(employee_id, '-created_at -__v').populate([
+      {
+        path: 'role_id',
+        select: '-_id -__v -created_at'
+      },
+      {
+        path: 'user_id',
+        select: '-__v -created_at -password -role_id'
+      }
+    ])
 
     if (!foundEmployee) {
       return res.status(404).json({
