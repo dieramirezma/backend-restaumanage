@@ -23,10 +23,11 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 app.use(cors({
-  origin: '*',
+  origin: 'http://localhost:3001',
   methods: 'GET, POST, PUT, DELETE',
   allowedHeaders: 'Content-Type, Authorization',
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  credentials: true
 }))
 
 // Routes
@@ -40,7 +41,7 @@ app.use('/api/tables', TableRoutes)
 app.use('/api/users', UserRoutes)
 
 app.get('/', (req, res) => {
-  res.send('RestauManage API 🚀')
+  res.send('<h1>RestauManage API 🚀</>')
 })
 
 app.listen(PORT, () => {

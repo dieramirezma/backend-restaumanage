@@ -28,6 +28,10 @@ const ReservationSchema = Schema({
     type: Number,
     required: true
   },
+  status: {
+    type: String, // Activa, Completada, Cancelada, Expirada
+    default: 'Activa'
+  },
   created_at: {
     type: Date,
     default: Date.now

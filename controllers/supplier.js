@@ -11,7 +11,7 @@ export const create = async (req, res) => {
   try {
     const {
       supplier_name,
-      contact_person,
+      email,
       contact_number,
       address
     } = req.body
@@ -20,14 +20,14 @@ export const create = async (req, res) => {
 
     const { role_name, role_permissions } = await getRoleById(roleId)
 
-    if (!role_permissions.includes('create_supplier') && role_name !== 'admin') {
+    if (!role_permissions.includes('create_supplier') && role_name !== 'admin' && role_name !== 'employee') {
       return res.status(403).json({
         status: 'error',
         message: 'You are not allowed to create a supplier'
       })
     }
 
-    if (!supplier_name || !contact_person || !contact_number || !address) {
+    if (!supplier_name || !email || !contact_number || !address) {
       return res.status(400).json({
         status: 'error',
         message: 'Please provide all required fields'
@@ -36,17 +36,14 @@ export const create = async (req, res) => {
 
     const supplier = new Supplier({
       supplier_name,
-      contact_person,
+      email,
       contact_number,
       address
     })
 
-    const foundSupplier = await Supplier.findOne({
-      $or: [
-        { supplier_name: supplier.supplier_name },
-        { contact_number: supplier.contact_number }
-      ]
-    })
+    const foundSupplier = await Supplier.findOne(
+      { email: supplier.email }
+    )
 
     if (foundSupplier) {
       return res.status(409).json({
@@ -117,7 +114,7 @@ export const update = async (req, res) => {
       message: 'Supplier updated successfully',
       data: {
         supplier_name: supplierUpdated.supplier_name,
-        contact_person: supplierUpdated.contact_person,
+        email: supplierUpdated.email,
         contact_number: supplierUpdated.contact_number,
         address: supplierUpdated.address
       }
@@ -137,7 +134,7 @@ export const getSuppliers = async (req, res) => {
 
     const { role_name, role_permissions } = await getRoleById(roleId)
 
-    if (!role_permissions.includes('list_supplier') && role_name !== 'admin') {
+    if (!role_permissions.includes('list_supplier') && role_name !== 'admin' && role_name !== 'employee') {
       return res.status(403).json({
         status: 'error',
         message: 'You are not allowed to list suppliers'
@@ -150,7 +147,7 @@ export const getSuppliers = async (req, res) => {
     const options = {
       page,
       limit: itemsPerPage,
-      select: '-created_at -__v'
+      select: '-__v'
     }
 
     const suppliers = await Supplier.paginate({}, options)

@@ -15,14 +15,14 @@ export const create = async (req, res) => {
 
     const { role_name, role_permissions } = await getRoleById(roleId)
 
-    if (!role_permissions.includes('create_inventory') && role_name !== 'admin') {
+    if (!role_permissions.includes('create_inventory') && role_name !== 'admin' && role_name !== 'employee') {
       return res.status(403).json({
         status: 'error',
         message: 'You are not allowed to create an inventory item'
       })
     }
 
-    if (!item.item_name || !item.quantity || !item.unit || !item.reorder_level || !item.supplier_id) {
+    if (!item.item_name || !item.quantity || !item.unit || !item.reorder_level || !item.supplier_id || !item.category) {
       return res.status(400).json({
         status: 'error',
         message: 'Please provide all required fields'
@@ -170,7 +170,7 @@ export const getInventoryItems = async (req, res) => {
 
     const { role_name, role_permissions } = await getRoleById(roleId)
 
-    if (!role_permissions.includes('list_inventory_items') && role_name !== 'admin') {
+    if (!role_permissions.includes('list_inventory_items') && role_name !== 'admin' && role_name !== 'employee') {
       return res.status(403).json({
         status: 'error',
         message: 'You are not allowed to list inventory items'

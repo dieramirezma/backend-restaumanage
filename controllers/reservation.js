@@ -132,10 +132,10 @@ export const getReservations = async (req, res) => {
 
     const { role_name } = await getRoleById(roleId)
 
-    if (role_name !== 'customer') {
+    if (role_name !== 'employee') {
       return res.status(403).json({
         status: 'error',
-        message: 'You are not allowed to delete a reservation'
+        message: 'You are not allowed to get reservations'
       })
     }
 
@@ -233,3 +233,5 @@ export const getOneReservation = async (req, res) => {
     })
   }
 }
+
+// TODO: Add update status reservation controller

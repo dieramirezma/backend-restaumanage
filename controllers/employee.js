@@ -145,9 +145,9 @@ export const getEmployees = async (req, res) => {
   try {
     const { roleId } = req.user
 
-    const { role_permissions } = await getRoleById(roleId)
+    const { role_name, role_permissions } = await getRoleById(roleId)
 
-    if (!role_permissions.includes('list_employees') && !role_permissions.includes('all')) {
+    if (!role_permissions.includes('list_employees') && !role_permissions.includes('all') && role_name !== 'employee') {
       return res.status(403).json({
         status: 'error',
         message: 'You do not have permission to list employees'

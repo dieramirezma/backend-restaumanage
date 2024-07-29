@@ -6,7 +6,7 @@ const SupplierSchema = Schema({
     type: String,
     required: true
   },
-  contact_person: {
+  email: {
     type: String,
     required: true
   },

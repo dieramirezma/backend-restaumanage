@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
+// TODO: Add Category field
 const InventorySchema = Schema({
   item_name: {
     type: String,
@@ -24,6 +25,10 @@ const InventorySchema = Schema({
   supplier_id: {
     type: Schema.ObjectId,
     ref: 'Supplier',
+    required: true
+  },
+  category: {
+    type: String,
     required: true
   }
 })

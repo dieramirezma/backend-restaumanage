@@ -15,14 +15,14 @@ export const create = async (req, res) => {
 
     const { role_name, role_permissions } = await getRoleById(roleId)
 
-    if (!role_permissions.includes('create_table') && role_name !== 'admin') {
+    if (!role_permissions.includes('create_table') && role_name !== 'admin' && role_name !== 'employee') {
       return res.status(403).json({
         status: 'error',
         message: 'You are not allowed to create a table'
       })
     }
 
-    if (!table.table_number || !table.capacity || !table.location) {
+    if (!table.table_number || !table.capacity || !table.location || !table.status) {
       return res.status(400).json({
         status: 'error',
         message: 'Please provide all required fields'
@@ -150,7 +150,7 @@ export const getTables = async (req, res) => {
 
     const { role_name, role_permissions } = await getRoleById(roleId)
 
-    if (!role_permissions.includes('list_tables') && role_name !== 'admin') {
+    if (!role_permissions.includes('list_tables') && role_name !== 'admin' && role_name !== 'customer' && role_name !== 'employee') {
       return res.status(403).json({
         status: 'error',
         message: 'You are not allowed to list tables'
@@ -207,7 +207,7 @@ export const getOneTable = async (req, res) => {
 
     const { role_name, role_permissions } = await getRoleById(roleId)
 
-    if (!role_permissions.includes('get_table') && role_name !== 'admin') {
+    if (!role_permissions.includes('get_table') && role_name !== 'admin' && role_name !== 'customer') {
       return res.status(403).json({
         status: 'error',
         message: 'You are not allowed to get information from a table'
@@ -242,6 +242,65 @@ export const getOneTable = async (req, res) => {
     return res.status(500).json({
       status: 'error',
       message: 'Error in the table get information process'
+    })
+  }
+}
+
+// TODO: Add update status table controller
+export const updateStatus = async (req, res) => {
+  try {
+    const table_id = req.params.id
+
+    const { roleId } = req.user
+
+    const { role_name } = await getRoleById(roleId)
+
+    if (role_name !== 'customer' && role_name !== 'admin' && role_name !== 'employee') {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You are not allowed to update the table status'
+      })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(table_id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid table id'
+      })
+    }
+
+    const foundTable = await Table.findById(table_id)
+
+    if (!foundTable) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Table not found'
+      })
+    }
+
+    const tableStatus = req.body.status
+
+    if (!['Disponible', 'Reservada'].includes(tableStatus)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Status must be either Disponible or Reservada'
+      })
+    }
+
+    const tableUpdated = await Table.findByIdAndUpdate(table_id, { status: tableStatus }, { new: true })
+
+    return res.status(201).json({
+      status: 'success',
+      message: 'Table status updated successfully',
+      data: {
+        table_number: tableUpdated.table_number,
+        status: tableUpdated.status
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error in the table status update process'
     })
   }
 }

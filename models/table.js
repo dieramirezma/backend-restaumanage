@@ -13,6 +13,10 @@ const TableSchema = Schema({
   location: {
     type: String, // IN, OUT
     required: true
+  },
+  status: {
+    type: String, // Disponible, Reservada
+    default: 'Disponible'
   }
 })
 
